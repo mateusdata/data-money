@@ -30,7 +30,7 @@ const PayScreen = () => {
   return (
     <View style={[styles.container, isDarkMode && styles.containerDark]}>
       <Text style={[styles.title, isDarkMode && styles.titleDark]}>
-        Página de Pagamento
+        Assinatura DataMoney
       </Text>
 
       {hasPlan ? (
@@ -56,14 +56,14 @@ const PayScreen = () => {
 
           <ScrollView>
             <Text style={[styles.cardText, isDarkMode && styles.textDark,{marginTop: 10}]}>
-              Sua assinatura renova em: {dayjs(currentPlan?.allExpirationDates?.['id_plano_basico:idplanobasico']).locale('pt-br').format('dddd, DD/MM/YYYY')}
+            Sua assinatura renova em: {dayjs(currentPlan?.allExpirationDates?.['id_plano_basico:idplanobasico']).locale('pt-br').format('dddd, DD/MM/YYYY')}
             </Text>
           </ScrollView>
         </View>
       ) : (
         <>
           <Text style={[styles.subtitle, isDarkMode && styles.textDark]}>
-            Bem-vindo à tela de pagamento! Escolha um plano para assinar:
+            Escolha um plano para assinar:
           </Text>
 
           <ScrollView contentContainerStyle={styles.scrollContainer}>

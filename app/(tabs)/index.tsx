@@ -102,7 +102,7 @@ const ShoppingListScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <Stack.Screen options={{ headerTitle: 'Data coints' }} />
+      <Stack.Screen options={{ headerTitle: `DataMoney ${hasPlan ? "Premium":  'Free'}` }} />
 
       <TextInput
         placeholder="Adicionar item"
@@ -146,7 +146,7 @@ const ShoppingListScreen: React.FC = () => {
         )}
       />
 
-      {!hasPlan && (
+      {false && (
         <BannerAd
           unitId={bannerAdUnitId}
           size={BannerAdSize.FULL_BANNER}

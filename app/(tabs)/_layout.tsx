@@ -1,74 +1,75 @@
-import {  DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { Tabs } from 'expo-router';
-import 'react-native-reanimated';
-//import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { useColorScheme } from '@/components/useColorScheme';
-import { StatusBar } from 'expo-status-bar';
-import CustomBottomNavigation from '@/components/CustomBottomNavigation';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import React from 'react';
+import { Platform } from 'react-native';
 
+import { Feather } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-export default function RootLayout() {
-  return <RootLayoutNav />;
-}
+import TabBarBackground from '@/components/ui/TabBarBackground';
+import { useColorScheme } from '@/components/useColorScheme.web';
+import { HapticTab } from '@/components/HapticTab';
+import { usePayment } from '@/contexts/PaymentProvider';
+import Colors from '@/constants/Colors';
 
-function RootLayoutNav() {
-  const colorScheme = useColorScheme();
+export default function TabLayout() {
+  const colorScheme = useColorScheme() as 'light' | 'dark';
+  const { hasPlan } = usePayment();
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-
-      <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
-
-      <Tabs key={1} tabBar={(props) => <CustomBottomNavigation {...props} />} >
-
-        <Tabs.Screen name="index" options={{
-          tabBarLabel: 'Início',
-          tabBarIcon: ({ focused, color, size }) => (
-        <Icon
-          name='home'
-          size={size}
-          color={color}
-        />
-          )
-        }} />
-        <Tabs.Screen name="role" options={{
-          tabBarLabel: 'Calculadora',
-          tabBarIcon: ({ focused, color, size }) => (
-        <Icon
-          name='calculator'
-          size={size}
-          color={color}
-        />
-          )
-        }} />
-        <Tabs.Screen name="premium" options={{
-          tabBarLabel: 'Crédito',
-          tabBarIcon: ({ focused, color, size }) => (
-        <Icon
-          name='cash'
-          size={size}
-          color={color}
-        />
+    <Tabs
+      screenOptions={{
+        tabBarActiveTintColor: Colors[colorScheme].primary,
+        headerShown: true,
+        tabBarButton: HapticTab,
+        tabBarBackground: TabBarBackground,
+        tabBarStyle: Platform.select({
+          ios: {
+            position: 'absolute',
+          },
+          default: {},
+        }),
+      }}
+    >
+      <Tabs.Screen
+        name="index"
+        options={{
+          title: 'Início',
+          tabBarIcon: ({ color, size }) => (
+            <Feather name="home" size={size} color={color} />
           ),
-          headerTitle: "Ganhe crédito"
-        }} />
+        }}
+      />
 
-        <Tabs.Screen name="pay" options={{
-          tabBarLabel: 'Pagamento',
-          tabBarIcon: ({ focused, color, size }) => (
-        <Icon
-          name='credit-card'
-          size={size}
-          color={color}
-          
-        />
+      <Tabs.Screen
+        name="role"
+        options={{
+          title: 'Calculadora',
+          tabBarIcon: ({ color, size }) => (
+            <Feather name="cpu" size={size} color={color} />
           ),
-          headerTitle: "Planos"
-        }} />
-      </Tabs>
+        }}
+      />
 
-    </ThemeProvider>
+      <Tabs.Screen
+        name="premium"
+        redirect={hasPlan}
+        options={{
+          title: 'Crédito',
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="credit-card-outline" size={size} color={color} />
+          ),
+        }}
+      />
+
+      <Tabs.Screen
+        name="pay"
+        options={{
+          title: 'Assinatura',
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="wallet-membership" size={size} color={color} />
+          ),
+        }}
+      />
+    </Tabs>
   );
 }
-

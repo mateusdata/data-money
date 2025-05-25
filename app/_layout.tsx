@@ -71,7 +71,7 @@ function RootLayoutNav() {
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <PaperProvider>
         <PaymentProvider>
-          <StatusBar style={colorScheme === 'dark' ? 'light' : 'light'} />
+
           <Stack screenOptions={{
 
             headerShown: false
@@ -80,7 +80,7 @@ function RootLayoutNav() {
           </Stack>
         </PaymentProvider>
       </PaperProvider>
-
+      <StatusBar style="auto" />
     </ThemeProvider >
   );
 }

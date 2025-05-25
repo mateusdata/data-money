@@ -1,4 +1,3 @@
-// imports
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, ScrollView, Dimensions, useColorScheme, Pressable } from 'react-native';
 import { TextInput } from 'react-native-paper';
@@ -72,10 +71,28 @@ const RuleOfThree = () => {
     setInputs((prev) => ({ ...prev, [key]: value }));
   };
 
+  // Format number as Brazilian Real (R$)
+  const formatCurrency = (value: string) => {
+    if (value === 'X') return 'X';
+    const number = parseFloat(value);
+    if (isNaN(number)) return value;
+    return number.toLocaleString('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+  };
+
   return (
-    <ScrollView style={[styles.container, { backgroundColor: isDark ? 'transparent' : '#fff' }]}>
+    <ScrollView
+      style={[styles.container, { backgroundColor: isDark ? 'transparent' : '#fff' }]}
+      contentContainerStyle={styles.scrollContent}
+    >
       <View style={styles.body}>
-        <Text style={[styles.subtitle, { color: isDark ? '#fff' : '#000' }]}>Regra de Três</Text>
+        <Text style={[styles.subtitle, { color: isDark ? '#fff' : '#000' }]}>
+          Regra de Três
+        </Text>
 
         <View style={styles.row}>
           <TextInput
@@ -85,7 +102,10 @@ const RuleOfThree = () => {
             onChangeText={(text) => handleChange('a', text)}
             mode="outlined"
             style={styles.input}
-            contentStyle={{borderWidth: 0.5 ,  backgroundColor: isDark ? '#1e1e1e' : '#fff' }}
+            contentStyle={{
+              borderWidth: 0.5,
+              backgroundColor: isDark ? '#1e1e1e' : '#fff',
+            }}
             theme={{ colors: { text: isDark ? '#fff' : '#000' }, roundness: 8 }}
             activeOutlineColor={colorPrymary}
           />
@@ -97,13 +117,18 @@ const RuleOfThree = () => {
             onChangeText={(text) => handleChange('b', text)}
             mode="outlined"
             style={styles.input}
-            contentStyle={{borderWidth: 0.5 ,  backgroundColor: isDark ? '#1e1e1e' : '#fff' }}
+            contentStyle={{
+              borderWidth: 0.5,
+              backgroundColor: isDark ? '#1e1e1e' : '#fff',
+            }}
             theme={{ colors: { text: isDark ? '#fff' : '#000' }, roundness: 8 }}
             activeOutlineColor={colorPrymary}
           />
         </View>
 
-        <Text style={[styles.label, { color: isDark ? '#ccc' : '#333' }]}>ASSIM COMO</Text>
+        <Text style={[styles.label, { color: isDark ? '#ccc' : '#333' }]}>
+          ASSIM COMO
+        </Text>
 
         <View style={styles.row}>
           <TextInput
@@ -113,25 +138,72 @@ const RuleOfThree = () => {
             onChangeText={(text) => handleChange('c', text)}
             mode="outlined"
             style={styles.input}
-            contentStyle={{borderWidth: 0.5 ,  backgroundColor: isDark ? '#1e1e1e' : '#fff' }}
+            contentStyle={{
+              borderWidth: 0.5,
+              backgroundColor: isDark ? '#1e1e1e' : '#fff',
+            }}
             theme={{ colors: { text: isDark ? '#fff' : '#000' }, roundness: 8 }}
             activeOutlineColor={colorPrymary}
           />
           <AntDesign name="arrowright" size={30} color="orange" style={styles.icon} />
           <TextInput
-            placeholder="Resultado"
+            placeholder="Resultado (R$)"
             value={inputs.result}
             editable={false}
             mode="outlined"
             style={styles.result}
-            contentStyle={{borderWidth: 0.5 ,  backgroundColor: isDark ? '#1e1e1e' : '#fff', color: 'orange'}}
+            contentStyle={{
+              borderWidth: 0.5,
+              backgroundColor: isDark ? '#1e1e1e' : '#fff',
+              color: 'orange',
+            }}
             theme={{ colors: { text: 'orange' }, roundness: 8 }}
             outlineColor={inputs.result !== 'X' && !error ? 'green' : undefined}
           />
         </View>
 
+        {inputs.result !== 'X' && !error && inputs.a && inputs.b && inputs.c && (
+          <View
+            style={[
+              styles.resultCard,
+              { backgroundColor: isDark ? '#2e2e2e' : '#f0f0f0' },
+            ]}
+          >
+            <Text
+              style={[styles.resultText, { color: isDark ? '#fff' : '#333' }]}
+            >
+              {`${inputs.a} kilos de Arroz ${formatCurrency(
+                inputs.b
+              )}, assim como ${inputs.c} kilos de Arroz ${formatCurrency(
+                inputs.result
+              )}`}
+            </Text>
+          </View>
+        )}
+
+        {inputs.result === 'X' && !error && (
+          <View
+            style={[
+              styles.resultCard,
+              { backgroundColor: isDark ? '#2e2e2e' : '#f0f0f0' },
+            ]}
+          >
+            <Text
+              style={[styles.resultText, { color: isDark ? '#fff' : '#333' }]}
+            >
+              Exemplo:{'\n'}
+              Se 2 kilos de Arroz R$ 10,00,{'\n'}
+              quanto custam 5 unidades?{'\n'}
+              Insira 2 em A, 10 em B e 5 em C para calcular o resultado.
+            </Text>
+          </View>
+        )}
+
         {(inputs.a || inputs.b || inputs.c) && (
-          <Pressable onPress={clearInputs} style={[styles.button, { backgroundColor: isDark ? '#2980b9' : '#3cb371' }]}>
+          <Pressable
+            onPress={clearInputs}
+            style={[styles.button, { backgroundColor: isDark ? '#2980b9' : '#3cb371' }]}
+          >
             <Text style={styles.buttonText}>Limpar</Text>
           </Pressable>
         )}
@@ -139,7 +211,9 @@ const RuleOfThree = () => {
         {error !== '' && <Text style={styles.errorText}>{error}</Text>}
       </View>
 
-      <Stack.Screen options={{ headerTitle: 'Regra de Três Simples', headerTitleAlign: 'center' }} />
+      <Stack.Screen
+        options={{ headerTitle: 'Regra de Três Simples', headerTitleAlign: 'center' }}
+      />
     </ScrollView>
   );
 };
@@ -151,29 +225,42 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 10,
   },
-  body: {
-    marginTop: 30,
+  scrollContent: {
+    flexGrow: 1,
+    justifyContent: 'center',
     alignItems: 'center',
+  },
+  body: {
+    width: '100%',
+    maxWidth: 600,
+    alignItems: 'center',
+    paddingVertical: 30,
   },
   subtitle: {
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 30,
+    textAlign: 'center',
   },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     marginBottom: 20,
+    width: '100%',
+    flexWrap: 'wrap',
   },
   input: {
-    width: width * 0.3,
+    width: width * 0.35,
+    maxWidth: 150,
     height: 50,
     fontSize: 18,
     textAlign: 'center',
     marginHorizontal: 5,
   },
   result: {
-    width: width * 0.3,
+    width: width * 0.35,
+    maxWidth: 150,
     height: 50,
     fontSize: 18,
     textAlign: 'center',
@@ -186,6 +273,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '500',
     marginVertical: 10,
+    textAlign: 'center',
   },
   button: {
     marginTop: 10,
@@ -196,11 +284,26 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: 16,
     color: 'white',
+    textAlign: 'center',
   },
   errorText: {
     color: 'red',
     marginTop: 10,
     fontSize: 14,
+    textAlign: 'center',
+  },
+  resultCard: {
+    padding: 15,
+    borderRadius: 8,
+    marginVertical: 10,
+    width: '90%',
+    maxWidth: 500,
+    alignItems: 'center',
+  },
+  resultText: {
+    fontSize: 16,
+    textAlign: 'center',
+    lineHeight: 24, // Added for better readability
   },
 });
 

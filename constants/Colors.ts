@@ -3,7 +3,6 @@ const tintColorDark = '#fff';
 export const colorPrymary = '#25D366';
 export const colorBlack = '#1C1C1C';
 
-
 export default {
   light: {
     text: '#000',
@@ -11,6 +10,7 @@ export default {
     tint: tintColorLight,
     tabIconDefault: '#ccc',
     tabIconSelected: tintColorLight,
+    primary: colorPrymary, 
   },
   dark: {
     text: '#fff',
@@ -18,7 +18,6 @@ export default {
     tint: tintColorDark,
     tabIconDefault: '#ccc',
     tabIconSelected: tintColorDark,
+    primary: colorPrymary, // cor primária adicionada
   },
 };
-
-
