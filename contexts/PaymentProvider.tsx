@@ -9,7 +9,7 @@ import Purchases, {
 
 export const API_KEYS = {
   ios: 'key_ios',
-  android: 'goog_fLElaPsfhtpyzKSmMHJZgVMinPj',
+  android: 'key',
 };
 
 interface PaymentContextProps {
