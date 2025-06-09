@@ -2,17 +2,12 @@
   "expo": {
     "name": "DataMoney",
     "slug": "data-compras",
-    "scheme": "DataMoney",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
+    "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
-    "splash": {
-      "image": "./assets/images/splash-icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.mateusdata.compras"
@@ -22,6 +17,7 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
+      "edgeToEdgeEnabled": true,
       "package": "com.mateusdata.compras",
       "permissions": [ "com.google.android.gms.permission.AD_ID" ]
     },
@@ -32,8 +28,21 @@
     },
     "plugins": [
       "expo-router",
-      
       [
+        "expo-splash-screen",
+        {
+          "image": "./assets/images/splash-icon.png",
+          "imageWidth": 200,
+          "resizeMode": "contain",
+          "backgroundColor": "#ffffff",
+          "dark": {
+            "image": "./assets/images/splash-icon.png",
+            "backgroundColor": "#000000"
+          }
+        }
+      ],
+      "expo-audio",
+       [
         "react-native-google-mobile-ads",
         {
           "androidAppId": "ca-app-pub-6242824020711835~1164268856",
@@ -41,15 +50,6 @@
         }
       ]
     ],
-    "extra": {
-      "router": {
-        "origin": false
-      },
-      "eas": {
-        "projectId": "649381e8-d1a9-44de-b4f2-284e8f993b43"
-      }
-    },
-    "owner": "mateusdata",
     "experiments": {
       "typedRoutes": true
     }

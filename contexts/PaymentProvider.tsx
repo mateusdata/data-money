@@ -8,7 +8,7 @@ import Purchases, {
 } from 'react-native-purchases';
 
 export const API_KEYS = {
-  ios: 'key_ios',
+  ios: 'key',
   android: 'key',
 };
 
