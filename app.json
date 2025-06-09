@@ -54,9 +54,14 @@
       "typedRoutes": true
     },
     
-    "eas": {
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
         "projectId": "649381e8-d1a9-44de-b4f2-284e8f993b43"
       }
+    }
     },
     "owner": "mateusdata"
   
