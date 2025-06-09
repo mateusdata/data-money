@@ -1,6 +1,8 @@
 import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
 import Animated, { Easing, useSharedValue, withTiming, useAnimatedStyle } from 'react-native-reanimated';
+import { ThemedView } from './ThemedView';
+import { ThemedText } from './ThemedText';
 
 const SplashScreen = () => {
   const opacity = useSharedValue(0);
@@ -21,13 +23,13 @@ const SplashScreen = () => {
   const image = require('../assets/images/icon-transparent.png');
 
   return (
-    <View style={styles.container}>
+    <ThemedView style={styles.container}>
       <Animated.View style={[styles.textContainer, animatedStyle]}>
      
         <Image source={image} style={styles.image} />
-        <Text style={styles.text}>Data Compras</Text>
+        <ThemedText>Data Compras</ThemedText>
       </Animated.View>
-    </View>
+    </ThemedView>
   );
 };
 
@@ -36,7 +38,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#fff',
   },
   textContainer: {
     alignItems: 'center',

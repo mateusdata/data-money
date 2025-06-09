@@ -8,8 +8,8 @@ import Purchases, {
 } from 'react-native-purchases';
 
 export const API_KEYS = {
-  ios: 'key',
-  android: 'key',
+  ios: 'goog_fLElaPsfhtpyzKSmMHJZgVMinPj',
+  android: 'goog_fLElaPsfhtpyzKSmMHJZgVMinPj',
 };
 
 interface PaymentContextProps {

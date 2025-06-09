@@ -5,7 +5,7 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "myapp",
+    "scheme": "DataMoney",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
@@ -52,6 +52,12 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
-  }
+    },
+    
+    "eas": {
+        "projectId": "649381e8-d1a9-44de-b4f2-284e8f993b43"
+      }
+    },
+    "owner": "mateusdata"
+  
 }

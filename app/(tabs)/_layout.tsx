@@ -9,7 +9,7 @@ import TabBarBackground from '@/components/ui/TabBarBackground';
 import { useColorScheme } from '@/components/useColorScheme.web';
 import { HapticTab } from '@/components/HapticTab';
 import { usePayment } from '@/contexts/PaymentProvider';
-import Colors from '@/constants/Colors';
+import { Colors } from '@/constants/Colors';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme() as 'light' | 'dark';

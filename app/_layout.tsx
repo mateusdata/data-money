@@ -11,7 +11,6 @@ import { colorBlack, colorPrymary } from '@/constants/Colors';
 import { StatusBar } from 'expo-status-bar';
 import { Platform } from 'react-native';
 import Splash from '@/components/SplashScreen';
-import Toast from 'react-native-toast-message';
 import { PaperProvider } from 'react-native-paper';
 import PaymentProvider from '@/contexts/PaymentProvider';
 
