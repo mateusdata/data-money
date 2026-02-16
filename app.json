@@ -19,7 +19,9 @@
       },
       "edgeToEdgeEnabled": true,
       "package": "com.mateusdata.compras",
-      "permissions": [ "com.google.android.gms.permission.AD_ID" ]
+      "permissions": [
+        "com.google.android.gms.permission.AD_ID"
+      ]
     },
     "web": {
       "bundler": "metro",
@@ -42,18 +44,20 @@
         }
       ],
       "expo-audio",
-       [
+      [
         "react-native-google-mobile-ads",
         {
           "androidAppId": "ca-app-pub-6242824020711835~1164268856",
           "iosAppId": null
         }
-      ]
+      ],
+      "expo-font",
+      "expo-image",
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true
     },
-    
     "extra": {
       "router": {
         "origin": false
@@ -62,7 +66,6 @@
         "projectId": "649381e8-d1a9-44de-b4f2-284e8f993b43"
       }
     }
-    },
-    "owner": "mateusdata"
-  
+  },
+  "owner": "mateusdata"
 }
