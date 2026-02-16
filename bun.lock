@@ -31,7 +31,7 @@
         "react-dom": "19.2.0",
         "react-native": "0.83.1",
         "react-native-gesture-handler": "~2.30.0",
-        "react-native-google-mobile-ads": "^15.4.0",
+        "react-native-google-mobile-ads": "^16.0.3",
         "react-native-paper": "^5.14.5",
         "react-native-purchases": "^8.11.3",
         "react-native-reanimated": "~4.2.1",
@@ -1395,7 +1395,7 @@
 
     "react-native-gesture-handler": ["react-native-gesture-handler@2.30.0", "", { "dependencies": { "@egjs/hammerjs": "^2.0.17", "hoist-non-react-statics": "^3.3.0", "invariant": "^2.2.4" }, "peerDependencies": { "react": "*", "react-native": "*" } }, "sha512-5YsnKHGa0X9C8lb5oCnKm0fLUPM6CRduvUUw2Bav4RIj/C3HcFh4RIUnF8wgG6JQWCL1//gRx4v+LVWgcIQdGA=="],
 
-    "react-native-google-mobile-ads": ["react-native-google-mobile-ads@15.4.0", "", { "dependencies": { "@iabtcf/core": "^1.5.3", "use-deep-compare-effect": "^1.8.1" }, "peerDependencies": { "expo": ">=47.0.0" } }, "sha512-ukTPpTutSsWW9HezushfHR0kIVrWBbbeuyZZwYVCGda9EyDQjW5s6kGmfZ4qJ7tJSvVq1qLR+Hu+W0L3TmNonA=="],
+    "react-native-google-mobile-ads": ["react-native-google-mobile-ads@16.0.3", "", { "dependencies": { "@iabtcf/core": "^1.5.6", "use-deep-compare-effect": "^1.8.1" }, "peerDependencies": { "expo": ">=47.0.0" }, "optionalPeers": ["expo"] }, "sha512-H+ViSEPiwAorLhKL29t6oaEN+thA1KTvSR8IYRY80Bv4Y62IdIYcucuqUsELrH2qFPC3+D2uPRG4HriLY/hjvA=="],
 
     "react-native-is-edge-to-edge": ["react-native-is-edge-to-edge@1.2.1", "", { "peerDependencies": { "react": "*", "react-native": "*" } }, "sha512-FLbPWl/MyYQWz+KwqOZsSyj2JmLKglHatd3xLZWskXOpRaio4LfEDEz8E/A6uD8QoTHW6Aobw1jbEwK7KMgR7Q=="],
 
