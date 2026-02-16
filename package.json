@@ -18,6 +18,7 @@
     "@react-navigation/native": "^7.1.6",
     "dayjs": "^1.11.13",
     "expo": "^55.0.0-preview.10",
+    "expo-asset": "~55.0.4",
     "expo-audio": "~55.0.5",
     "expo-blur": "~55.0.5",
     "expo-constants": "~55.0.4",
@@ -43,7 +44,8 @@
     "react-native-safe-area-context": "~5.6.2",
     "react-native-screens": "~4.22.0",
     "react-native-web": "^0.21.0",
-    "react-native-webview": "13.16.0"
+    "react-native-webview": "13.16.0",
+    "react-native-worklets": "0.7.2"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

@@ -5,11 +5,9 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "DataMoney",
+    "scheme": "data-money",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true,
       "bundleIdentifier": "com.mateusdata.compras"
     },
     "android": {
@@ -17,7 +15,6 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true,
       "package": "com.mateusdata.compras",
       "permissions": [
         "com.google.android.gms.permission.AD_ID"
@@ -48,12 +45,13 @@
         "react-native-google-mobile-ads",
         {
           "androidAppId": "ca-app-pub-6242824020711835~1164268856",
-          "iosAppId": null
+          "iosAppId": "ca-app-pub-6242824020711835/4227622528"
         }
       ],
       "expo-font",
       "expo-image",
-      "expo-web-browser"
+      "expo-web-browser",
+      "expo-asset"
     ],
     "experiments": {
       "typedRoutes": true
@@ -66,6 +64,5 @@
         "projectId": "649381e8-d1a9-44de-b4f2-284e8f993b43"
       }
     }
-  },
-  "owner": "mateusdata"
+  }
 }
