@@ -1,6 +1,6 @@
-import { Tabs } from 'expo-router';
+import { router, Tabs } from 'expo-router';
 import React from 'react';
-import { Platform } from 'react-native';
+import { Platform, TouchableOpacity } from 'react-native';
 
 import { Feather } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -10,6 +10,7 @@ import { useColorScheme } from '@/components/useColorScheme.web';
 import { HapticTab } from '@/components/HapticTab';
 import { usePayment } from '@/contexts/PaymentProvider';
 import { Colors } from '@/constants/Colors';
+import { ThemedText } from '@/components/ThemedText';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme() as 'light' | 'dark';
@@ -20,6 +21,13 @@ export default function TabLayout() {
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme].primary,
         headerShown: true,
+        headerRight: () => (
+          <TouchableOpacity onPress={()=> router.push("/game")} style={{  padding: 8, borderRadius: 4 }}>
+            <ThemedText>
+              Game
+            </ThemedText>
+          </TouchableOpacity>
+        ),
         tabBarButton: HapticTab,
         tabBarBackground: TabBarBackground,
         tabBarStyle: Platform.select({

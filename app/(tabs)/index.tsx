@@ -102,7 +102,10 @@ const ShoppingListScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <Stack.Screen options={{ headerTitle: `DataMoney ${hasPlan ? "Premium":  'Free'}` }} />
+      <Stack.Screen options={{
+        headerTitle: `DataMoney ${hasPlan ? "Premium" : 'Free'}`,
+       
+      }} />
 
       <TextInput
         placeholder="Adicionar item"

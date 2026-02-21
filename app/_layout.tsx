@@ -14,68 +14,19 @@ import Splash from '@/components/SplashScreen';
 import { PaperProvider } from 'react-native-paper';
 import PaymentProvider from '@/contexts/PaymentProvider';
 
-
-
-export const unstable_settings = {
-  // Ensure that reloading on `/modal` keeps a back button present.
-  initialRouteName: '(tabs)',
-};
-
-// Prevent the splash screen from auto-hiding before asset loading is complete.
-SplashScreen.preventAutoHideAsync();
-
 export default function RootLayout() {
-  const [loaded, error] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-    ...FontAwesome.font,
-  });
-  const [appIsReady, setAppIsReady] = useState(false);
-
-
-
-  useEffect(() => {
-    if (error) throw error;
-  }, [error]);
-
-  useEffect(() => {
-
-    async function prepare() {
-      try {
-
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        if (loaded) {
-          SplashScreen.hideAsync();
-        }
-      } catch (e) {
-        console.warn(e);
-      } finally {
-        setAppIsReady(true);
-      }
-    }
-
-    prepare();
-  }, [loaded]);
-
-  if (!appIsReady || !loaded) {
-    return <Splash />;
-  }
-
-  return <RootLayoutNav />;
-}
-
-function RootLayoutNav() {
   const colorScheme = useColorScheme();
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <PaperProvider>
         <PaymentProvider>
-
           <Stack screenOptions={{
-
-            headerShown: false
+            headerShown: false,
+            
           }}>
             <Stack.Screen name="(tabs)" options={{}} />
+            <Stack.Screen name="game" options={{ headerShown: false}} />
           </Stack>
         </PaymentProvider>
       </PaperProvider>
