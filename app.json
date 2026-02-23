@@ -9,7 +9,10 @@
     "userInterfaceStyle": "automatic",
     "ios": {
       "bundleIdentifier": "com.mateusdata.compras",
-      "appleTeamId": "CU85DT3YP9"
+      "appleTeamId": "CU85DT3YP9",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -18,11 +21,6 @@
       },
       "package": "com.mateusdata.compras",
       "permissions": [
-        "com.google.android.gms.permission.AD_ID",
-        "android.permission.RECORD_AUDIO",
-        "android.permission.MODIFY_AUDIO_SETTINGS",
-        "android.permission.FOREGROUND_SERVICE",
-        "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK",
         "com.google.android.gms.permission.AD_ID",
         "android.permission.RECORD_AUDIO",
         "android.permission.MODIFY_AUDIO_SETTINGS",
