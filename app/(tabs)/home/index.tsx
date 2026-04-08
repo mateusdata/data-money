@@ -1,6 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, FlatList, useColorScheme, ToastAndroid, View as RNView, TouchableOpacity } from 'react-native';
-import { TextInput, IconButton } from 'react-native-paper';
+import {
+  StyleSheet,
+  FlatList,
+  useColorScheme,
+  ToastAndroid,
+  View as RNView,
+  TouchableOpacity,
+  ScrollView,
+  Platform,
+  UIManager,
+  LayoutAnimation
+} from 'react-native';
+import { TextInput } from 'react-native-paper';
 import { Stack, router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
@@ -11,6 +22,11 @@ import { colorPrymary } from '@/constants/Colors';
 import { ads, useAds } from '@/contexts/ads-provider';
 import { ThemedText } from '@/components/ThemedText';
 import { favoriteList } from '@/utils/List';
+
+// Habilita animações fluidas no Android
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
 
 interface State {
   items: string[];
@@ -46,7 +62,6 @@ const ShoppingListScreen: React.FC = () => {
     } catch (error) { }
   };
 
-  // Adicionada a flag "isFromList" para saber a origem da ação
   const addItem = (item: string, isFromList: boolean = false) => {
     if (item.trim() === '') return;
 
@@ -56,13 +71,14 @@ const ShoppingListScreen: React.FC = () => {
       return;
     }
 
-    const updatedItems = [...state.items, item];
+    // Animação suave ao adicionar
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    const updatedItems = [item, ...state.items]; // Adiciona no topo da lista (UX melhor)
 
     setState((prev) => ({ ...prev, items: updatedItems, newItem: '' }));
     saveItems(updatedItems);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
-    // Lógica nova: Só chama anúncio se veio da lista rápida e se o rand for > 0.80
     if (!isPro && isFromList) {
       if (Math.random() > 0.8) {
         showInterstitial();
@@ -71,47 +87,29 @@ const ShoppingListScreen: React.FC = () => {
   };
 
   const removeItem = (index: number) => {
+    // Animação suave ao remover
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     const updatedItems = state.items.filter((_, i) => i !== index);
+
     setState((prev) => ({ ...prev, items: updatedItems }));
     saveItems(updatedItems);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
   };
 
-  const renderFavoritesList = () => {
-    if (!favoriteList || favoriteList.length === 0) return null;
-
-    return (
-      <RNView style={styles.favoritesContainer}>
-        {state.items.length > 0 && <RNView style={[styles.divider, { backgroundColor: isDark ? '#333' : '#E0E0E0' }]} />}
-
-        <ThemedText style={styles.sectionTitle}>
-          Itens mais procurados da lista
-        </ThemedText>
-
-        {favoriteList.map((item) => (
-          <RNView key={item.id.toString()} style={[styles.menuGroup, { backgroundColor: isDark ? '#1E1E1E' : '#FFFFFF', marginBottom: 12 }]}>
-            <RNView style={styles.menuItem}>
-              <RNView style={styles.menuContent}>
-                <RNView style={styles.menuIconContainer}>
-                  <Ionicons name="pricetag-outline" size={20} color={colorPrymary} />
-                </RNView>
-                <RNView style={styles.menuTextContainer}>
-                  <ThemedText style={[styles.menuLabel, { color: isDark ? '#F0F0F0' : '#111' }]}>
-                    {item.name}
-                  </ThemedText>
-                </RNView>
-              </RNView>
-              <IconButton
-                icon="plus"
-                iconColor={colorPrymary}
-                size={22}
-                onPress={() => addItem(item.name, true)} // true = veio da lista (ativa a chance de anúncio)
-              />
-            </RNView>
-          </RNView>
-        ))}
+  // Componente de Empty State (Estado Vazio)
+  const renderEmptyState = () => (
+    <RNView style={styles.emptyStateContainer}>
+      <RNView style={[styles.emptyIconCircle, { backgroundColor: isDark ? '#1E1E1E' : '#F0F0F0' }]}>
+        <Ionicons name="basket-outline" size={48} color={isDark ? '#555' : '#CCC'} />
       </RNView>
-    );
-  };
+      <ThemedText style={[styles.emptyTitle, { color: isDark ? '#E2E8F0' : '#334155' }]}>
+        Sua lista está vazia
+      </ThemedText>
+      <ThemedText style={[styles.emptySubtitle, { color: isDark ? '#94A3B8' : '#94A3B8' }]}>
+        Adicione itens acima ou escolha nas sugestões rápidas para começar suas compras.
+      </ThemedText>
+    </RNView>
+  );
 
   return (
     <RNView style={[styles.container, { backgroundColor: isDark ? '#121212' : '#F8F8F8' }]}>
@@ -119,6 +117,7 @@ const ShoppingListScreen: React.FC = () => {
         headerTitle: `DataMoney ${isPro ? "Pro" : 'Free'}`,
         headerStyle: { backgroundColor: isDark ? '#1E1E1E' : '#FFFFFF' },
         headerTintColor: isDark ? '#FFFFFF' : '#111111',
+        headerShadowVisible: false, // Tira a linha do header para um visual mais limpo
         headerRight: () => (
           !isPro ? (
             <TouchableOpacity
@@ -133,42 +132,78 @@ const ShoppingListScreen: React.FC = () => {
         ),
       }} />
 
-      <RNView style={styles.sectionContainer}>
+      {/* Área Fixa Superior (Input + Sugestões Rápidas) */}
+      <RNView style={[styles.topSection, { backgroundColor: isDark ? '#1E1E1E' : '#FFFFFF' }]}>
         <TextInput
-          placeholder="Adicionar item"
+          placeholder="O que você precisa comprar?"
           value={state.newItem}
           onChangeText={(text) => setState((prev) => ({ ...prev, newItem: text }))}
-          onSubmitEditing={() => addItem(state.newItem, false)} // false = digitado manualmente (sem anúncio)
+          onSubmitEditing={() => addItem(state.newItem, false)}
           returnKeyType="done"
           mode="outlined"
           style={styles.input}
           outlineStyle={{ borderRadius: 16, borderColor: isDark ? '#333' : '#E0E0E0' }}
-          contentStyle={{ backgroundColor: isDark ? '#1E1E1E' : '#FFF', color: isDark ? '#FFF' : '#000' }}
+          contentStyle={{ backgroundColor: isDark ? '#121212' : '#F8F8F8', color: isDark ? '#FFF' : '#111' }}
           placeholderTextColor={isDark ? '#888' : '#AAA'}
           activeOutlineColor={colorPrymary}
+          left={<TextInput.Icon icon="magnify" color={isDark ? '#888' : '#AAA'} />}
+          right={
+            state.newItem.length > 0 ? (
+              <TextInput.Icon
+                icon="plus-circle"
+                color={colorPrymary}
+                onPress={() => addItem(state.newItem, false)}
+              />
+            ) : null
+          }
         />
+
+        {/* Chips de Adição Rápida (Horizontal Scroll) */}
+        {favoriteList && favoriteList.length > 0 && (
+          <RNView style={styles.quickAddContainer}>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.quickAddScroll}>
+              {favoriteList.map((item) => (
+                <TouchableOpacity
+                  key={item.id.toString()}
+                  style={[styles.chip, { backgroundColor: isDark ? 'rgba(37, 211, 102, 0.15)' : 'rgba(37, 211, 102, 0.1)' }]}
+                  activeOpacity={0.7}
+                  onPress={() => addItem(item.name, true)}
+                >
+                  <Ionicons name="add" size={16} color={colorPrymary} />
+                  <ThemedText style={[styles.chipText, { color: colorPrymary }]}>{item.name}</ThemedText>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </RNView>
+        )}
       </RNView>
 
+      {/* Lista Principal */}
       <FlatList
         data={state.items}
         keyExtractor={(_, index) => index.toString()}
         contentContainerStyle={styles.listContainer}
         showsVerticalScrollIndicator={false}
-        ListFooterComponent={renderFavoritesList}
+        ListEmptyComponent={renderEmptyState}
         renderItem={({ item, index }) => (
-          <RNView style={[styles.menuGroup, { backgroundColor: isDark ? '#1E1E1E' : '#FFFFFF', marginBottom: 12 }]}>
+          <RNView style={[styles.menuGroup, { backgroundColor: isDark ? '#1E1E1E' : '#FFFFFF' }]}>
             <RNView style={styles.menuItem}>
               <RNView style={styles.menuContent}>
-                <RNView style={styles.menuIconContainer}>
-                  <Ionicons name="cart-outline" size={20} color={colorPrymary} />
-                </RNView>
+                {/* Botão de Check/Concluir em vez de ícone estático de carrinho */}
+                <TouchableOpacity
+                  style={styles.checkboxContainer}
+                  onPress={() => removeItem(index)}
+                  activeOpacity={0.6}
+                >
+                  <RNView style={[styles.checkbox, { borderColor: isDark ? '#444' : '#CCC' }]} />
+                </TouchableOpacity>
+
                 <RNView style={styles.menuTextContainer}>
-                  <ThemedText style={[styles.menuLabel, { color: isDark ? '#F0F0F0' : '#111' }]}>
+                  <ThemedText style={[styles.menuLabel, { color: isDark ? '#F0F0F0' : '#334155' }]}>
                     {item}
                   </ThemedText>
                 </RNView>
               </RNView>
-              <IconButton icon="trash-can-outline" iconColor="#FF4757" size={22} onPress={() => removeItem(index)} />
             </RNView>
           </RNView>
         )}
@@ -176,13 +211,13 @@ const ShoppingListScreen: React.FC = () => {
 
       {/* Área do Banner Inferior */}
       {!isPro ? (
-        <RNView style={{ alignItems: 'center', paddingBottom: 4 }}>
+        <RNView style={styles.bannerContainer}>
           <BannerAd unitId={ads.banner} size={BannerAdSize.FULL_BANNER} />
         </RNView>
       ) : (
-        <RNView style={{ alignItems: 'center', paddingBottom: 30 }}>
-          <ThemedText style={{ fontSize: 13, color: colorPrymary, fontWeight: '700' }}>
-            DataMoney Pro
+        <RNView style={styles.proFooter}>
+          <ThemedText style={{ fontSize: 12, color: colorPrymary, fontWeight: '700' }}>
+            ✨ DataMoney Pro Ativo
           </ThemedText>
         </RNView>
       )}
@@ -195,8 +230,19 @@ export default ShoppingListScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  topSection: {
     paddingHorizontal: 20,
-    paddingTop: 20,
+    paddingTop: 16,
+    paddingBottom: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(0,0,0,0.05)',
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    zIndex: 10,
   },
   premiumButton: {
     flexDirection: 'row',
@@ -211,45 +257,66 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: 'bold',
   },
-  sectionContainer: {
-    marginBottom: 22,
-  },
   input: {
-    marginBottom: 8,
+    marginBottom: 12,
+  },
+  quickAddContainer: {
+    marginHorizontal: -20, // Faz o scroll ir até a borda da tela
+  },
+  quickAddScroll: {
+    paddingHorizontal: 20,
+    gap: 8,
+    paddingBottom: 8,
+  },
+  chip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 20,
+    gap: 4,
+  },
+  chipText: {
+    fontSize: 14,
+    fontWeight: '600',
   },
   listContainer: {
-    paddingBottom: 20, // Reduzi para dar espaço ao banner sem cortar
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 100, // Espaço pro banner
+    gap: 12,
   },
   menuGroup: {
     borderRadius: 16,
     overflow: 'hidden',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
+    shadowOpacity: 0.03,
     shadowRadius: 8,
-    elevation: 2,
+    elevation: 1,
   },
   menuItem: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 12,
-    paddingLeft: 16,
-    paddingRight: 8,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
   },
   menuContent: {
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
   },
-  menuIconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: 'rgba(37, 211, 102, 0.1)',
-    justifyContent: 'center',
-    alignItems: 'center',
+  checkboxContainer: {
     marginRight: 16,
+    padding: 4, // Área de toque maior
+  },
+  checkbox: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    borderWidth: 2,
+    backgroundColor: 'transparent',
   },
   menuTextContainer: {
     flex: 1,
@@ -257,20 +324,46 @@ const styles = StyleSheet.create({
   menuLabel: {
     fontSize: 16,
     fontWeight: '500',
-    marginBottom: 2,
   },
-  favoritesContainer: {
-    marginTop: 10,
-    paddingBottom: 20,
+  emptyStateContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 60,
+    paddingHorizontal: 32,
   },
-  divider: {
-    height: 1,
-    marginVertical: 20,
-    opacity: 0.5,
+  emptyIconCircle: {
+    width: 96,
+    height: 96,
+    borderRadius: 48,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 24,
   },
-  sectionTitle: {
-    fontSize: 18,
+  emptyTitle: {
+    fontSize: 20,
     fontWeight: 'bold',
-    marginBottom: 16,
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  emptySubtitle: {
+    fontSize: 14,
+    textAlign: 'center',
+    lineHeight: 20,
+  },
+  bannerContainer: {
+    position: 'absolute',
+    bottom: 0,
+    width: '100%',
+    alignItems: 'center',
+    paddingBottom: 4,
+    backgroundColor: 'transparent',
+  },
+  proFooter: {
+    position: 'absolute',
+    bottom: 0,
+    width: '100%',
+    alignItems: 'center',
+    paddingBottom: 30,
+    paddingTop: 20,
   },
 });
