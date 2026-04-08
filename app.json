@@ -48,7 +48,6 @@
           }
         }
       ],
-      "expo-audio",
       [
         "react-native-google-mobile-ads",
         {
@@ -76,7 +75,8 @@
       "policy": "appVersion"
     },
     "updates": {
-      "url": "https://u.expo.dev/649381e8-d1a9-44de-b4f2-284e8f993b43"
+      "url": "https://u.expo.dev/649381e8-d1a9-44de-b4f2-284e8f993b43",
+      "enableBsdiffPatchSupport": true
     }
   }
 }
