@@ -2,7 +2,7 @@
 
 # dependencies
 node_modules/
-.playwright-mcp
+
 # Expo
 .expo/
 dist/
@@ -44,10 +44,5 @@ app-example
 *.aab
 *.apk
 *.ipa
-.playwright-mcp
-
-google-services.json
-GoogleService-Info.plist
-revenuecat-key.json
 google-play-key.json
 bundletool.jar

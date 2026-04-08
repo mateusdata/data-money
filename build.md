@@ -1,77 +1,32 @@
+eas build --profile production --platform all
 
-# Build para publicação
-  eas build --platform android --profile production  execultar o build de produção
-  eas submit -p android --profile production enviar para playstore (opcional)
-  eas build --local --platform android --profile production  execultar o build de produção localmente
+eas update --branch production --message "mensagem" --platform all
 
+eas update:list --branch production --json
 
+eas update:delete GROUPID --non-interactive
 
-# comandos para build
-Fazer build remoto expo: 
-  eas build -p android --profile preview  => build expo generate apk for install
+eas update:roll-back-to-embedded --branch production --message "mensagem" --runtime-version "1.0.0" --non-interactive
 
-Download e install utimo build: 
-  eas build:run -p android --latest  => baixar utim,o build android 
-
-Fazer build localmente sem time: 
-  eas build --local --platform android --profile preview
-
-Fazer build localmente:
-  time eas build --local --platform android --profile preview
-
-#----------------------------------------------------------------------#
-
-Fazer build local IOS build:
-  time eas build --local --platform ios --profile preview 
-
-Fazer build remoto IOS expo:
-eas build -p ios --profile preview build ios no servidor expo 
-eas build --platform ios
-eas submit --platform ios
+eas branch:list --json
 
 
-# MOSTRAR LISTA DE build ios
-eas build:run -p ios     
+report  system
+cd android && ./gradlew signingReport 
 
-#BAIXAR O UTIMO build ios
-eas build:run -p ios --latest
+bunx expo run:android --variant release -d
 
 
-#Config for build expo ios and android
+web
+npx expo export -p web
+eas deploy --prod   
 
-* ios
+eas build --local -p android --non-interactive --profile production --output=./release.aab
+chmod +x deploy-android.sh
 
-{
-  "build": {
-    "preview": {
-      "ios": {
-        "simulator": true
-      }
-    },
-    "production": {}
-  }
-}
+# 1. Instala o Ruby (base do Fastlane)
+sudo apt update
+sudo apt install ruby-full build-essential -y
 
-* android
-
-{
-  "build": {
-    "preview": {
-      "android": {
-        "buildType": "apk"
-      }
-    },
-    "preview2": {
-      "android": {
-        "gradleCommand": ":app:assembleRelease"
-      }
-    },
-    "preview3": {
-      "developmentClient": true
-    },
-    "preview4": {
-      "distribution": "internal"
-    },
-    "production": {}
-  }
-}
+# 2. Instala o Fastlane de verdade
+sudo gem install fastlane -v 2.212.1 # Versão estável
