@@ -166,7 +166,7 @@ const ShoppingListScreen: React.FC = () => {
   const colorScheme = useColorScheme() ?? 'light';
   const isDark = colorScheme === 'dark';
 
-  const { isPro, showInterstitial } = useAds();
+  const { isPro, showInterstitial, showRewardedInterstitial } = useAds();
 
   useEffect(() => {
     const loadData = async () => {
@@ -263,7 +263,7 @@ const ShoppingListScreen: React.FC = () => {
       setState((prev) => ({ ...prev, items: remainingItems }));
       saveItems(remainingItems);
 
-      if (!isPro) showInterstitial();
+      if (!isPro) showRewardedInterstitial();
     }, 1800);
   };
 
