@@ -12,7 +12,7 @@ import { StatusBar } from 'expo-status-bar';
 import { Platform } from 'react-native';
 import Splash from '@/components/SplashScreen';
 import { PaperProvider } from 'react-native-paper';
-import PaymentProvider from '@/contexts/PaymentProvider';
+import { AdsProvider } from '@/contexts/ads-provider';
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
@@ -20,15 +20,12 @@ export default function RootLayout() {
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <PaperProvider>
-        <PaymentProvider>
-          <Stack screenOptions={{
-            headerShown: false,
-            
-          }}>
+        <AdsProvider>
+          <Stack screenOptions={{ headerShown: false }}>
             <Stack.Screen name="(tabs)" options={{}} />
-            <Stack.Screen name="game" options={{ headerShown: false}} />
+            <Stack.Screen name="subscription" options={{ headerShown: false }} />
           </Stack>
-        </PaymentProvider>
+        </AdsProvider>
       </PaperProvider>
       <StatusBar style="auto" />
     </ThemeProvider >

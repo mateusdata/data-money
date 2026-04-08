@@ -34,11 +34,11 @@ export default function MainList({ onAddItem }: MainListProps) {
     <View style={styles.container}>
       <Text style={styles.title}>Itens mais procurados da lista</Text>
       <FlatList
-      contentContainerStyle={{ alignItems: 'flex-end' }}
-      numColumns={2}
-      data={[...list].reverse()}
-      renderItem={renderItem}
-      keyExtractor={(item) => item.id.toString()}
+        contentContainerStyle={{ alignItems: 'flex-end' }}
+        numColumns={2}
+        data={[...list].reverse()}
+        renderItem={renderItem}
+        keyExtractor={(item) => item.id.toString()}
       />
     </View>
   );
