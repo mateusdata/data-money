@@ -17,12 +17,10 @@ import Purchases, { LOG_LEVEL, PurchasesPackage } from 'react-native-purchases'
 import { Text } from 'react-native-paper'
 import { useRouter } from 'expo-router'
 
-const ENTITLEMENT_ID = 'entitlements_basic' // ID comum caso não use o 'mobile-apps-core-firebase Pro' no data-money
-
 const DEFAULT_FEATURES = [
-    'Chamadas de voz ilimitadas',
-    'Sem anúncios obstrutivos',
-    'Novos recursos premium',
+    'App 100% sem anúncios',
+    'Faça compras sem interrupções no mercado',
+    'Calculadora livre de propagandas',
 ]
 
 const Subscription = () => {
@@ -31,34 +29,29 @@ const Subscription = () => {
     const isDark = colorScheme === 'dark'
 
     const [monthlyPackage, setMonthlyPackage] = useState<PurchasesPackage | null>(null)
-    const [features, setFeatures] = useState<string[]>(DEFAULT_FEATURES)
-    const [isLoading, setIsLoading] = useState(true)
     const [isPurchasing, setIsPurchasing] = useState(false)
 
+    // Busca o pacote em background apenas para o botão de assinar funcionar
     useEffect(() => {
         const fetchOfferings = async () => {
-            setIsLoading(true)
             try {
                 const offerings = await Purchases.getOfferings()
 
                 if (offerings.current !== null && offerings.current.availablePackages.length > 0) {
-                    const monthly = offerings.current.availablePackages.find(
+                    let monthly = offerings.current.availablePackages.find(
                         (p) => p.packageType === 'MONTHLY' || p.identifier === '$rc_monthly'
                     )
 
+                    if (!monthly) {
+                        monthly = offerings.current.availablePackages[0]
+                    }
+
                     if (monthly) {
                         setMonthlyPackage(monthly)
-                        const desc = monthly.product.description
-                        if (desc) {
-                            const lines = desc.split('\n').map((l) => l.trim()).filter((l) => l.length > 0)
-                            if (lines.length > 0) setFeatures(lines)
-                        }
                     }
                 }
             } catch (e: any) {
-                console.warn(e)
-            } finally {
-                setIsLoading(false)
+                console.warn("Erro ao buscar ofertas:", e)
             }
         }
 
@@ -67,14 +60,14 @@ const Subscription = () => {
 
     const handleSubscribe = async () => {
         if (!monthlyPackage) {
-            Alert.alert('Erro', 'Pacote não encontrado. Verifique sua conexão.')
+            Alert.alert('Aguarde', 'Conectando com a loja de aplicativos. Tente novamente em alguns segundos.')
             return
         }
 
         setIsPurchasing(true)
         try {
             const result = await Purchases.purchasePackage(monthlyPackage)
-            
+
             const actives = Object.values(result.customerInfo.entitlements.active);
             if (actives.length > 0) {
                 Alert.alert(
@@ -147,27 +140,26 @@ const Subscription = () => {
                     </View>
                     <Text style={styles.titlePro}>Pro</Text>
 
-                    <ThemedText style={styles.subtitle}>
+                    <ThemedText style={[styles.subtitle, { color: isDark ? '#A0AAB5' : '#4A5568' }]}>
                         Desbloqueie todos os recursos{'\n'}sem anúncios ilimitado
                     </ThemedText>
                 </View>
 
-                {isLoading ? (
-                    <ActivityIndicator size="large" color={Colors.light.primary} style={{ marginVertical: 28 }} />
-                ) : (
-                    <LinearGradient
-                        colors={isDark ? ['rgba(37,211,102,0.12)', 'rgba(37,211,102,0.04)'] : ['rgba(37,211,102,0.08)', 'rgba(37,211,102,0.02)']}
-                        style={styles.priceBox}
-                    >
-                        <ThemedText type="subtitle" style={[styles.price, { color: isDark ? '#fff' : '#111' }]}>
-                            {monthlyPackage?.product.priceString || '...'}
-                        </ThemedText>
-                        <ThemedText style={styles.period}>por mês · Cancele quando quiser</ThemedText>
-                    </LinearGradient>
-                )}
+                {/* Preço Fixo Hardcoded */}
+                <LinearGradient
+                    colors={isDark ? ['rgba(37,211,102,0.12)', 'rgba(37,211,102,0.04)'] : ['rgba(37,211,102,0.08)', 'rgba(37,211,102,0.02)']}
+                    style={styles.priceBox}
+                >
+                    <ThemedText type="subtitle" style={[styles.price, { color: isDark ? '#fff' : '#111' }]}>
+                        R$ 5,90
+                    </ThemedText>
+                    <ThemedText style={[styles.period, { color: isDark ? '#94A3B8' : '#4A5568' }]}>
+                        por mês · Cancele quando quiser
+                    </ThemedText>
+                </LinearGradient>
 
                 <View style={styles.features}>
-                    {features.map((text, index) => (
+                    {DEFAULT_FEATURES.map((text, index) => (
                         <Feature key={index} text={text} isDark={isDark} />
                     ))}
                 </View>
@@ -181,7 +173,7 @@ const Subscription = () => {
                     <TouchableOpacity
                         style={styles.buttonInner}
                         onPress={handleSubscribe}
-                        disabled={isPurchasing || isLoading}
+                        disabled={isPurchasing}
                     >
                         {isPurchasing
                             ? <ActivityIndicator size="small" color="#fff" />
@@ -201,17 +193,19 @@ const Subscription = () => {
                         onPress={handleRestore}
                         disabled={isPurchasing}
                     >
-                        <Text style={styles.secondaryText}>Restaurar Compras</Text>
+                        <Text style={[styles.secondaryText, { color: isDark ? '#FFFFFF' : '#111111' }]}>
+                            Restaurar Compras
+                        </Text>
                     </TouchableOpacity>
                 </LinearGradient>
 
                 <View style={styles.footer}>
-                    <ThemedText style={styles.disclaimer}>Ao continuar, você concorda com o </ThemedText>
-                    
+                    <ThemedText style={[styles.disclaimer, { color: isDark ? '#94A3B8' : '#475569' }]}>Ao continuar, você concorda com o </ThemedText>
+
                     <TouchableOpacity onPress={() => Linking.openURL('https://legal.mateusdata.com.br/snap-line/privacy-policy')}>
                         <ThemedText style={styles.footerLink}>Termos de Uso</ThemedText>
                     </TouchableOpacity>
-                    <ThemedText style={styles.disclaimer}> e </ThemedText>
+                    <ThemedText style={[styles.disclaimer, { color: isDark ? '#94A3B8' : '#475569' }]}> e </ThemedText>
                     <TouchableOpacity onPress={() => Linking.openURL('https://legal.mateusdata.com.br/snap-line/privacy-policy')}>
                         <ThemedText style={styles.footerLink}>Política de Privacidade</ThemedText>
                     </TouchableOpacity>
@@ -229,7 +223,7 @@ const Feature = ({ text, isDark }: { text: string, isDark: boolean }) => (
         >
             <Ionicons name="checkmark" size={13} color={Colors.light.primary} />
         </LinearGradient>
-        <ThemedText style={[styles.featureText, { color: isDark ? '#99aacc' : '#556677' }]}>{text}</ThemedText>
+        <ThemedText style={[styles.featureText, { color: isDark ? '#E2E8F0' : '#334155' }]}>{text}</ThemedText>
     </View>
 )
 
@@ -297,7 +291,6 @@ const styles = StyleSheet.create({
     },
     subtitle: {
         fontSize: 14,
-        color: '#7788aa',
         textAlign: 'center',
         lineHeight: 22,
         marginTop: 4,
@@ -319,7 +312,6 @@ const styles = StyleSheet.create({
     },
     period: {
         fontSize: 13,
-        color: '#556677',
         marginTop: 4,
         textAlign: 'center',
     },
@@ -341,7 +333,8 @@ const styles = StyleSheet.create({
         marginRight: 12,
     },
     featureText: {
-        fontSize: 14,
+        fontSize: 15,
+        fontWeight: '500',
     },
     buttonGradient: {
         borderRadius: 100,
@@ -371,7 +364,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     secondaryText: {
-        color: Colors.light.primary,
         fontWeight: '600',
         fontSize: 15,
     },
@@ -384,7 +376,6 @@ const styles = StyleSheet.create({
     },
     disclaimer: {
         fontSize: 12,
-        color: '#445566',
     },
     footerLink: {
         fontSize: 12,
