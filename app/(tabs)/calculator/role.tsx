@@ -1,9 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, ScrollView, useColorScheme, Pressable, View as RNView, KeyboardAvoidingView, Platform } from 'react-native';
-import { TextInput, IconButton } from 'react-native-paper';
+import {
+  StyleSheet,
+  ScrollView,
+  useColorScheme,
+  Pressable,
+  View as RNView,
+  KeyboardAvoidingView,
+  Platform,
+  TouchableOpacity
+} from 'react-native';
+import { TextInput } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
 import { ThemedText } from '@/components/ThemedText';
-import { Stack } from 'expo-router';
+import { Stack, router } from 'expo-router';
 import { colorPrymary } from '@/constants/Colors';
 import { ads, useAds } from '@/contexts/ads-provider';
 import { BannerAd, BannerAdSize } from 'react-native-google-mobile-ads';
@@ -59,7 +68,6 @@ const RuleOfThree = () => {
   };
 
   const handleChange = (key: keyof typeof inputs, value: string) => {
-    // Permite digitar números e vírgula/ponto
     const formattedValue = value.replace(/[^0-9.,]/g, '');
     setInputs((prev) => ({ ...prev, [key]: formattedValue }));
   };
@@ -89,10 +97,21 @@ const RuleOfThree = () => {
         <Stack.Screen
           options={{
             headerTitle: `Calculadora ${isPro ? "Pro" : "Free"}`,
-            headerTitleAlign: 'center',
             headerStyle: { backgroundColor: isDark ? '#1E1E1E' : '#FFFFFF' },
             headerTintColor: isDark ? '#FFFFFF' : '#111111',
             headerShadowVisible: false,
+            headerRight: () => (
+              !isPro ? (
+                <TouchableOpacity
+                  onPress={() => router.push('/subscription')}
+                  style={styles.premiumButton}
+                  activeOpacity={0.8}
+                >
+                  <Ionicons name="star" size={12} color="#FFF" style={{ marginRight: 4 }} />
+                  <ThemedText style={styles.premiumButtonText}>Assinar PRO</ThemedText>
+                </TouchableOpacity>
+              ) : null
+            ),
           }}
         />
 
@@ -111,9 +130,11 @@ const RuleOfThree = () => {
                 value={inputs.a}
                 onChangeText={(text) => handleChange('a', text)}
                 mode="outlined"
-                style={styles.input}
-                contentStyle={{ backgroundColor: isDark ? '#1E1E1E' : '#FFF', color: isDark ? '#FFF' : '#111' }}
-                outlineStyle={{ borderRadius: 16, borderColor: isDark ? '#333' : '#E0E0E0' }}
+                textAlign="center" // <-- O SEGREDO PRO CURSOR NATIVO FICAR NO MEIO
+                style={[styles.input, { backgroundColor: isDark ? '#1E1E1E' : '#FFFFFF' }]}
+                contentStyle={{ textAlign: 'center' }}
+                textColor={isDark ? '#FFFFFF' : '#111111'}
+                outlineStyle={{ borderRadius: 16, borderWidth: 1, borderColor: isDark ? '#333' : '#E0E0E0' }}
                 placeholderTextColor={isDark ? '#888' : '#AAA'}
                 activeOutlineColor={colorPrymary}
               />
@@ -126,9 +147,11 @@ const RuleOfThree = () => {
                 value={inputs.b}
                 onChangeText={(text) => handleChange('b', text)}
                 mode="outlined"
-                style={styles.input}
-                contentStyle={{ backgroundColor: isDark ? '#1E1E1E' : '#FFF', color: isDark ? '#FFF' : '#111' }}
-                outlineStyle={{ borderRadius: 16, borderColor: isDark ? '#333' : '#E0E0E0' }}
+                textAlign="center" // <-- O SEGREDO PRO CURSOR NATIVO FICAR NO MEIO
+                style={[styles.input, { backgroundColor: isDark ? '#1E1E1E' : '#FFFFFF' }]}
+                contentStyle={{ textAlign: 'center' }}
+                textColor={isDark ? '#FFFFFF' : '#111111'}
+                outlineStyle={{ borderRadius: 16, borderWidth: 1, borderColor: isDark ? '#333' : '#E0E0E0' }}
                 placeholderTextColor={isDark ? '#888' : '#AAA'}
                 activeOutlineColor={colorPrymary}
               />
@@ -149,9 +172,11 @@ const RuleOfThree = () => {
                 value={inputs.c}
                 onChangeText={(text) => handleChange('c', text)}
                 mode="outlined"
-                style={styles.input}
-                contentStyle={{ backgroundColor: isDark ? '#1E1E1E' : '#FFF', color: isDark ? '#FFF' : '#111' }}
-                outlineStyle={{ borderRadius: 16, borderColor: isDark ? '#333' : '#E0E0E0' }}
+                textAlign="center" // <-- O SEGREDO PRO CURSOR NATIVO FICAR NO MEIO
+                style={[styles.input, { backgroundColor: isDark ? '#1E1E1E' : '#FFFFFF' }]}
+                contentStyle={{ textAlign: 'center' }}
+                textColor={isDark ? '#FFFFFF' : '#111111'}
+                outlineStyle={{ borderRadius: 16, borderWidth: 1, borderColor: isDark ? '#333' : '#E0E0E0' }}
                 placeholderTextColor={isDark ? '#888' : '#AAA'}
                 activeOutlineColor={colorPrymary}
               />
@@ -163,14 +188,13 @@ const RuleOfThree = () => {
                 value={inputs.result !== 'X' ? formatCurrency(inputs.result) : ''}
                 editable={false}
                 mode="outlined"
-                style={styles.input}
-                contentStyle={{
-                  backgroundColor: isDark ? 'rgba(37,211,102,0.1)' : 'rgba(37,211,102,0.05)',
-                  color: colorPrymary,
-                  fontWeight: 'bold'
-                }}
+                textAlign="center" // <-- O SEGREDO PRO CURSOR NATIVO FICAR NO MEIO
+                style={[styles.input, { backgroundColor: isDark ? 'rgba(37,211,102,0.1)' : 'rgba(37,211,102,0.05)' }]}
+                contentStyle={{ textAlign: 'center', fontWeight: 'bold' }}
+                textColor={colorPrymary}
                 outlineStyle={{
                   borderRadius: 16,
+                  borderWidth: inputs.result !== 'X' && !error ? 1.5 : 1,
                   borderColor: inputs.result !== 'X' && !error ? colorPrymary : (isDark ? '#333' : '#E0E0E0')
                 }}
               />
@@ -244,16 +268,11 @@ const RuleOfThree = () => {
 
         </RNView>
       </ScrollView>
-      {/* Área do Banner Inferior */}
-      {!isPro ? (
-        <RNView style={{ alignItems: 'center', paddingBottom: 4 }}>
+
+      {/* Área do Banner Inferior - Exibida apenas se não for Pro */}
+      {!isPro && (
+        <RNView style={styles.bannerContainer}>
           <BannerAd unitId={ads.banner} size={BannerAdSize.FULL_BANNER} />
-        </RNView>
-      ) : (
-        <RNView style={{ alignItems: 'center', paddingBottom: 30 }}>
-          <ThemedText style={{ fontSize: 13, color: colorPrymary, fontWeight: '700' }}>
-            DataMoney Pro
-          </ThemedText>
         </RNView>
       )}
     </KeyboardAvoidingView>
@@ -270,6 +289,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 20,
     paddingBottom: 40,
+  },
+  premiumButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colorPrymary,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+  },
+  premiumButtonText: {
+    color: '#FFF',
+    fontSize: 12,
+    fontWeight: 'bold',
   },
   body: {
     width: '100%',
@@ -288,9 +320,9 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
+    shadowOpacity: 0.03,
     shadowRadius: 8,
-    elevation: 2,
+    elevation: 1,
     marginBottom: 20,
   },
   row: {
@@ -298,13 +330,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     width: '100%',
-    gap: 10, // Adicionado gap para responsividade limpa
+    gap: 10,
   },
   input: {
-    flex: 1, // Faz com que os inputs dividam o espaço igualmente independente da tela
+    flex: 1,
     height: 54,
     fontSize: 16,
-    textAlign: 'center',
   },
   icon: {
     paddingHorizontal: 4,
@@ -347,9 +378,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
+    shadowOpacity: 0.03,
     shadowRadius: 8,
-    elevation: 2,
+    elevation: 1,
     marginBottom: 20,
   },
   iconCircle: {
@@ -378,6 +409,11 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: 16,
     fontWeight: '600',
+  },
+  bannerContainer: {
+    alignItems: 'center',
+    paddingBottom: 4,
+    backgroundColor: 'transparent',
   },
 });
 

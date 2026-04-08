@@ -9,10 +9,9 @@ export default function TabLayout() {
 
   return (
     <NativeTabs
-      backgroundColor={scheme === 'dark' ? '#1c1c1c' : '#ffffff'}
-      indicatorColor={theme.primary}
-      labelStyle={{ selected: { color: theme.primary } }}>
-      
+
+    >
+
       <NativeTabs.Trigger name="home">
         <NativeTabs.Trigger.Label>Início</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon sf="house.fill" md="home" />
