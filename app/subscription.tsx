@@ -136,7 +136,7 @@ const Subscription = () => {
 
                     <View style={styles.titleRow}>
                         <Text style={[styles.titleWhite, { color: isDark ? '#fff' : '#111' }]}>DATA</Text>
-                        <Text style={styles.titleAccent}>MONEY</Text>
+                        <Text style={styles.titleAccent}>COMPRAS</Text>
                     </View>
                     <Text style={styles.titlePro}>Pro</Text>
 

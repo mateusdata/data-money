@@ -8,7 +8,9 @@
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",
-    "lint": "expo lint"
+    "lint": "expo lint",
+    "deploy": "time ./deploy-android.sh",
+    "update": "time eas update --branch production --environment production --message \"testev2\" --non-interactive"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.2",
