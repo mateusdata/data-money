@@ -285,7 +285,7 @@ const ShoppingListScreen: React.FC = () => {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <RNView style={[styles.container, { backgroundColor: isDark ? '#121212' : '#F8F8F8' }]}>
         <Stack.Screen options={{
-          headerTitle: `DataMoney ${isPro ? "Pro" : 'Free'}`,
+          headerTitle: `Data Compras ${isPro ? "Pro" : 'Free'}`,
           headerStyle: { backgroundColor: isDark ? '#1E1E1E' : '#FFFFFF' },
           headerTintColor: isDark ? '#FFFFFF' : '#111111',
           headerShadowVisible: false,

@@ -18,26 +18,28 @@ export const API_KEYS = {
   android: 'goog_fLElaPsfhtpyzKSmMHJZgVMinPj',
 };
 
-// Chaves do AdMob (Testes no __DEV__ e Produção no build final)
-export const ads = {
-  intersticial: Platform.select({
-    ios: __DEV__ ? 'ca-app-pub-3940256099942544/4411468910' : '',
-    android: __DEV__ ? 'ca-app-pub-3940256099942544/1033173712' : 'ca-app-pub-6242824020711835/2624690184',
-  })!,
-  rewardedInterstitial: Platform.select({
-    ios: __DEV__ ? 'ca-app-pub-3940256099942544/5354046379' : '',
-    android: __DEV__ ? 'ca-app-pub-3940256099942544/5354046379' : 'ca-app-pub-6242824020711835/2562421488',
-  })!,
-  rewardedInterstitial2: Platform.select({
-    ios: __DEV__ ? 'ca-app-pub-3940256099942544/5354046379' : '',
-    android: __DEV__ ? 'ca-app-pub-3940256099942544/5354046379' : 'ca-app-pub-6242824020711835/4637920480',
-  })!,
-  banner: Platform.select({
-    ios: __DEV__ ? 'ca-app-pub-3940256099942544/2934735716' : '',
-    // Se você tiver a chave do banner de produção, troque a string abaixo!
-    android: __DEV__ ? 'ca-app-pub-3940256099942544/6300978111' : 'ca-app-pub-3940256099942544/6300978111',
-  })!,
-};
+import { TestIds } from "react-native-google-mobile-ads"
+
+interface Ads {
+    banner: string,
+    intersticial: string,
+    rewardedInterstitial: string,
+}
+
+export const ads: Ads = {
+    banner: Platform.select({
+        ios: __DEV__ ? TestIds.BANNER : 'ca-app-pub-6242824020711835/6894303333', 
+        android: __DEV__ ? TestIds.BANNER : 'ca-app-pub-6242824020711835/6894303333',
+    })!,
+    intersticial: Platform.select({
+        ios: __DEV__ ? TestIds.INTERSTITIAL : 'ca-app-pub-6242824020711835/9622194017',
+        android: __DEV__ ? TestIds.INTERSTITIAL : 'ca-app-pub-6242824020711835/9622194017',
+    })!,
+    rewardedInterstitial: Platform.select({
+        ios: __DEV__ ? TestIds.REWARDED_INTERSTITIAL : 'ca-app-pub-6242824020711835/5331595214',
+        android: __DEV__ ? TestIds.REWARDED_INTERSTITIAL : 'ca-app-pub-6242824020711835/5331595214',
+    })!,
+}
 
 type RewardCallback = (reward: { type: string; amount: number }) => void;
 
