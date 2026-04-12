@@ -19,6 +19,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
 import { Ionicons } from '@expo/vector-icons';
 import { BannerAd, BannerAdSize } from 'react-native-google-mobile-ads';
+import { ads } from '@/constants/ads';
 
 // Animações e Gestos
 import Animated, {
@@ -33,7 +34,7 @@ import Animated, {
 import { Gesture, GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { colorPrymary } from '@/constants/Colors';
-import { ads, useAds } from '@/contexts/ads-provider';
+import {  useAds } from '@/contexts/ads-provider';
 import { ThemedText } from '@/components/ThemedText';
 import { favoriteList } from '@/utils/List';
 
@@ -166,7 +167,7 @@ const ShoppingListScreen: React.FC = () => {
   const colorScheme = useColorScheme() ?? 'light';
   const isDark = colorScheme === 'dark';
 
-  const { isPro, showInterstitial, showRewardedInterstitial } = useAds();
+  const { isPro, showInterstitial, showRewardedInterstitial, showRewarded } = useAds();
 
   useEffect(() => {
     const loadData = async () => {
@@ -223,7 +224,7 @@ const ShoppingListScreen: React.FC = () => {
 
     if (!isPro && isFromList) {
       if (Math.random() > 0.8) {
-        showInterstitial();
+        showRewardedInterstitial();
       }
     }
   };
@@ -263,7 +264,7 @@ const ShoppingListScreen: React.FC = () => {
       setState((prev) => ({ ...prev, items: remainingItems }));
       saveItems(remainingItems);
 
-      if (!isPro) showRewardedInterstitial();
+      if (!isPro) showRewarded();
     }, 1800);
   };
 

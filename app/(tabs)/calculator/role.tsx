@@ -14,8 +14,9 @@ import { Ionicons } from '@expo/vector-icons';
 import { ThemedText } from '@/components/ThemedText';
 import { Stack, router } from 'expo-router';
 import { colorPrymary } from '@/constants/Colors';
-import { ads, useAds } from '@/contexts/ads-provider';
+import {  useAds } from '@/contexts/ads-provider';
 import { BannerAd, BannerAdSize } from 'react-native-google-mobile-ads';
+import { ads } from '@/constants/ads';
 
 const RuleOfThree = () => {
   const [inputs, setInputs] = useState({ a: '', b: '', c: '', result: 'X' });

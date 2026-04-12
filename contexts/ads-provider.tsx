@@ -1,64 +1,62 @@
 import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
-import { Platform } from 'react-native';
+import { Platform, AppState } from 'react-native';
 import Purchases, {
   LOG_LEVEL,
   CustomerInfo,
   PurchasesConfiguration,
 } from 'react-native-purchases';
 import {
+  AppOpenAd,
   InterstitialAd,
+  RewardedAd,
   RewardedInterstitialAd,
   AdEventType,
   RewardedAdEventType,
 } from 'react-native-google-mobile-ads';
+import { ads } from '@/constants/ads';
 
-// Chaves do RevenueCat
 export const API_KEYS = {
   ios: 'goog_fLElaPsfhtpyzKSmMHJZgVMinPj',
   android: 'goog_fLElaPsfhtpyzKSmMHJZgVMinPj',
 };
 
-import { TestIds } from "react-native-google-mobile-ads"
-
-interface Ads {
-    banner: string,
-    intersticial: string,
-    rewardedInterstitial: string,
-}
-
-export const ads: Ads = {
-    banner: Platform.select({
-        ios: __DEV__ ? TestIds.BANNER : 'ca-app-pub-6242824020711835/6894303333', 
-        android: __DEV__ ? TestIds.BANNER : 'ca-app-pub-6242824020711835/6894303333',
-    })!,
-    intersticial: Platform.select({
-        ios: __DEV__ ? TestIds.INTERSTITIAL : 'ca-app-pub-6242824020711835/9622194017',
-        android: __DEV__ ? TestIds.INTERSTITIAL : 'ca-app-pub-6242824020711835/9622194017',
-    })!,
-    rewardedInterstitial: Platform.select({
-        ios: __DEV__ ? TestIds.REWARDED_INTERSTITIAL : 'ca-app-pub-6242824020711835/5331595214',
-        android: __DEV__ ? TestIds.REWARDED_INTERSTITIAL : 'ca-app-pub-6242824020711835/5331595214',
-    })!,
-}
-
 type RewardCallback = (reward: { type: string; amount: number }) => void;
 
 interface AdsContextType {
   isPro: boolean;
-  showInterstitial: (onClose?: () => void) => void;
-  showRewardedInterstitial: (onReward?: RewardCallback, onClose?: () => void) => void;
+  showAppOpen: (onClose?: () => void) => void | null;
+  showInterstitial: (onClose?: () => void) => void | null;
+  showRewarded: (onReward?: RewardCallback, onClose?: () => void) => void | null;
+  showRewardedInterstitial: (onReward?: RewardCallback, onClose?: () => void) => void | null;
 }
+
+const APP_OPEN_EXPIRY_MS = 14400000;
 
 const AdsContext = createContext<AdsContextType>({
   isPro: false,
-  showInterstitial: () => { },
-  showRewardedInterstitial: () => { },
+  showAppOpen: () => {},
+  showInterstitial: () => {},
+  showRewarded: () => {},
+  showRewardedInterstitial: () => {},
 });
 
 export function AdsProvider({ children }: { children: React.ReactNode }) {
   const [isPro, setIsPro] = useState(false);
 
-  // Inicializa o RevenueCat e verifica se o usuário é PRO
+  const appOpenReady = useRef(false);
+  const appOpenLoadedAt = useRef<number | null>(null);
+  const interstitialReady = useRef(false);
+  const rewardedReady = useRef(false);
+  const rewardedInterstitialReady = useRef(false);
+  
+  const appState = useRef(AppState.currentState);
+  const isFirstLaunch = useRef(true);
+
+  const appOpen = useRef(AppOpenAd.createForAdRequest(ads.appOpen)).current;
+  const interstitial = useRef(InterstitialAd.createForAdRequest(ads.intersticial)).current;
+  const rewarded = useRef(RewardedAd.createForAdRequest(ads.rewarded)).current;
+  const rewardedInterstitial = useRef(RewardedInterstitialAd.createForAdRequest(ads.rewardedInterstitial)).current;
+
   useEffect(() => {
     const initRC = async () => {
       try {
@@ -76,94 +74,208 @@ export function AdsProvider({ children }: { children: React.ReactNode }) {
         checkPro(info);
 
         Purchases.addCustomerInfoUpdateListener(checkPro);
-      } catch (err) {
-        console.warn('Erro RevenueCat:', err);
-      }
+      } catch (err) {}
     };
     initRC();
   }, []);
 
-  // Referências dos anúncios
-  const interstitial = useRef(InterstitialAd.createForAdRequest(ads.intersticial)).current;
-  const rewardedInterstitial = useRef(RewardedInterstitialAd.createForAdRequest(ads.rewardedInterstitial)).current;
-  const interstitialReady = useRef(false);
-  const rewardedReady = useRef(false);
-
-  // Carrega Intersticial em background (se não for PRO)
   useEffect(() => {
     if (isPro) return;
-    const lLoaded = interstitial.addAdEventListener(AdEventType.LOADED, () => {
+
+    const onLoaded = appOpen.addAdEventListener(AdEventType.LOADED, () => {
+      appOpenReady.current = true;
+      appOpenLoadedAt.current = Date.now();
+
+      if (isFirstLaunch.current) {
+        isFirstLaunch.current = false;
+        showAppOpen();
+      }
+    });
+
+    const onClosed = appOpen.addAdEventListener(AdEventType.CLOSED, () => {
+      appOpenReady.current = false;
+      appOpenLoadedAt.current = null;
+      appOpen.load();
+    });
+
+    appOpen.load();
+
+    return () => {
+      onLoaded();
+      onClosed();
+    };
+  }, [isPro, appOpen]);
+
+  useEffect(() => {
+    if (isPro) return;
+
+    const onLoaded = interstitial.addAdEventListener(AdEventType.LOADED, () => {
       interstitialReady.current = true;
     });
-    const lClosed = interstitial.addAdEventListener(AdEventType.CLOSED, () => {
+    const onClosed = interstitial.addAdEventListener(AdEventType.CLOSED, () => {
       interstitialReady.current = false;
-      interstitial.load(); // Recarrega para a próxima vez
+      interstitial.load();
     });
 
     interstitial.load();
 
     return () => {
-      lLoaded();
-      lClosed();
+      onLoaded();
+      onClosed();
     };
   }, [isPro, interstitial]);
 
-  // Carrega Intersticial Premiado em background (se não for PRO)
   useEffect(() => {
     if (isPro) return;
-    const lLoaded = rewardedInterstitial.addAdEventListener(RewardedAdEventType.LOADED, () => {
+
+    const onLoaded = rewarded.addAdEventListener(RewardedAdEventType.LOADED, () => {
       rewardedReady.current = true;
     });
-    const lClosed = rewardedInterstitial.addAdEventListener(AdEventType.CLOSED, () => {
+    const onClosed = rewarded.addAdEventListener(AdEventType.CLOSED, () => {
       rewardedReady.current = false;
-      rewardedInterstitial.load(); // Recarrega para a próxima vez
+      rewarded.load();
+    });
+
+    rewarded.load();
+
+    return () => {
+      onLoaded();
+      onClosed();
+    };
+  }, [isPro, rewarded]);
+
+  useEffect(() => {
+    if (isPro) return;
+
+    const onLoaded = rewardedInterstitial.addAdEventListener(RewardedAdEventType.LOADED, () => {
+      rewardedInterstitialReady.current = true;
+    });
+    const onClosed = rewardedInterstitial.addAdEventListener(AdEventType.CLOSED, () => {
+      rewardedInterstitialReady.current = false;
+      rewardedInterstitial.load();
     });
 
     rewardedInterstitial.load();
 
     return () => {
-      lLoaded();
-      lClosed();
+      onLoaded();
+      onClosed();
     };
   }, [isPro, rewardedInterstitial]);
 
-  // Função para chamar Intersticial comum
-  function showInterstitial(onClose?: () => void) {
-    if (isPro || !interstitialReady.current) {
+  useEffect(() => {
+    if (isPro) return;
+
+    const subscription = AppState.addEventListener('change', (nextAppState) => {
+      if (
+        appState.current.match(/inactive|background/) &&
+        nextAppState === 'active'
+      ) {
+        showAppOpen();
+      }
+      appState.current = nextAppState;
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  }, [isPro]);
+
+  function showAppOpen(onClose?: () => void) {
+    if (isPro) {
       onClose?.();
-      return;
+      return null;
     }
+
+    const isExpired = appOpenLoadedAt.current !== null && Date.now() - appOpenLoadedAt.current > APP_OPEN_EXPIRY_MS;
+
+    if (!appOpenReady.current || isExpired) {
+      if (isExpired) {
+        appOpenReady.current = false;
+        appOpenLoadedAt.current = null;
+        appOpen.load();
+      }
+      onClose?.();
+      return null;
+    }
+
+    const unsub = appOpen.addAdEventListener(AdEventType.CLOSED, () => {
+      unsub();
+      onClose?.();
+    });
+
+    appOpen.show();
+  }
+
+  function showInterstitial(onClose?: () => void) {
+    if (isPro) {
+      onClose?.();
+      return null;
+    }
+
+    if (!interstitialReady.current) {
+      onClose?.();
+      return null;
+    }
+
     const unsub = interstitial.addAdEventListener(AdEventType.CLOSED, () => {
       unsub();
       onClose?.();
     });
+
     interstitial.show();
   }
 
-  // Função para chamar Intersticial Premiado
+  function showRewarded(onReward?: RewardCallback, onClose?: () => void) {
+    if (isPro) {
+      onReward?.({ type: 'pro_reward', amount: 1 });
+      onClose?.();
+      return null;
+    }
+
+    if (!rewardedReady.current) {
+      onClose?.();
+      return null;
+    }
+
+    const unsubReward = rewarded.addAdEventListener(RewardedAdEventType.EARNED_REWARD, (reward) => {
+      unsubReward();
+      onReward?.(reward);
+    });
+    const unsubClose = rewarded.addAdEventListener(AdEventType.CLOSED, () => {
+      unsubClose();
+      onClose?.();
+    });
+
+    rewarded.show();
+  }
+
   function showRewardedInterstitial(onReward?: RewardCallback, onClose?: () => void) {
     if (isPro) {
       onReward?.({ type: 'pro_reward', amount: 1 });
       onClose?.();
-      return;
+      return null;
     }
-    if (!rewardedReady.current) {
+
+    if (!rewardedInterstitialReady.current) {
       onClose?.();
-      return;
+      return null;
     }
-    const unsubR = rewardedInterstitial.addAdEventListener(RewardedAdEventType.EARNED_REWARD, (rew) => {
-      unsubR();
-      onReward?.(rew);
+
+    const unsubReward = rewardedInterstitial.addAdEventListener(RewardedAdEventType.EARNED_REWARD, (reward) => {
+      unsubReward();
+      onReward?.(reward);
     });
-    const unsubC = rewardedInterstitial.addAdEventListener(AdEventType.CLOSED, () => {
-      unsubC();
+    const unsubClose = rewardedInterstitial.addAdEventListener(AdEventType.CLOSED, () => {
+      unsubClose();
       onClose?.();
     });
+
     rewardedInterstitial.show();
   }
 
   return (
-    <AdsContext.Provider value={{ isPro, showInterstitial, showRewardedInterstitial }}>
+    <AdsContext.Provider value={{ isPro, showAppOpen, showInterstitial, showRewarded, showRewardedInterstitial }}>
       {children}
     </AdsContext.Provider>
   );
