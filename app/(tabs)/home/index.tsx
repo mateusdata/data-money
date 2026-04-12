@@ -223,8 +223,8 @@ const ShoppingListScreen: React.FC = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
     if (!isPro && isFromList) {
-      if (Math.random() > 0.8) {
-        showRewardedInterstitial();
+      if (Math.random() > 0.9) {
+        //showRewardedInterstitial();
       }
     }
   };
