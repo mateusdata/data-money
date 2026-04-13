@@ -1,12 +1,11 @@
 import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
-import { Platform, AppState } from 'react-native';
+import { Platform } from 'react-native';
 import Purchases, {
   LOG_LEVEL,
   CustomerInfo,
   PurchasesConfiguration,
 } from 'react-native-purchases';
 import {
-  AppOpenAd,
   InterstitialAd,
   RewardedAd,
   RewardedInterstitialAd,
@@ -24,17 +23,13 @@ type RewardCallback = (reward: { type: string; amount: number }) => void;
 
 interface AdsContextType {
   isPro: boolean;
-  showAppOpen: (onClose?: () => void) => void | null;
   showInterstitial: (onClose?: () => void) => void | null;
   showRewarded: (onReward?: RewardCallback, onClose?: () => void) => void | null;
   showRewardedInterstitial: (onReward?: RewardCallback, onClose?: () => void) => void | null;
 }
 
-const APP_OPEN_EXPIRY_MS = 14400000;
-
 const AdsContext = createContext<AdsContextType>({
   isPro: false,
-  showAppOpen: () => {},
   showInterstitial: () => {},
   showRewarded: () => {},
   showRewardedInterstitial: () => {},
@@ -43,16 +38,10 @@ const AdsContext = createContext<AdsContextType>({
 export function AdsProvider({ children }: { children: React.ReactNode }) {
   const [isPro, setIsPro] = useState(false);
 
-  const appOpenReady = useRef(false);
-  const appOpenLoadedAt = useRef<number | null>(null);
   const interstitialReady = useRef(false);
   const rewardedReady = useRef(false);
   const rewardedInterstitialReady = useRef(false);
-  
-  const appState = useRef(AppState.currentState);
-  const isFirstLaunch = useRef(true);
 
-  const appOpen = useRef(AppOpenAd.createForAdRequest(ads.appOpen)).current;
   const interstitial = useRef(InterstitialAd.createForAdRequest(ads.intersticial)).current;
   const rewarded = useRef(RewardedAd.createForAdRequest(ads.rewarded)).current;
   const rewardedInterstitial = useRef(RewardedInterstitialAd.createForAdRequest(ads.rewardedInterstitial)).current;
@@ -78,33 +67,6 @@ export function AdsProvider({ children }: { children: React.ReactNode }) {
     };
     initRC();
   }, []);
-
-  useEffect(() => {
-    if (isPro) return;
-
-    const onLoaded = appOpen.addAdEventListener(AdEventType.LOADED, () => {
-      appOpenReady.current = true;
-      appOpenLoadedAt.current = Date.now();
-
-      if (isFirstLaunch.current) {
-        isFirstLaunch.current = false;
-        showAppOpen();
-      }
-    });
-
-    const onClosed = appOpen.addAdEventListener(AdEventType.CLOSED, () => {
-      appOpenReady.current = false;
-      appOpenLoadedAt.current = null;
-      appOpen.load();
-    });
-
-    appOpen.load();
-
-    return () => {
-      onLoaded();
-      onClosed();
-    };
-  }, [isPro, appOpen]);
 
   useEffect(() => {
     if (isPro) return;
@@ -162,50 +124,6 @@ export function AdsProvider({ children }: { children: React.ReactNode }) {
       onClosed();
     };
   }, [isPro, rewardedInterstitial]);
-
-  useEffect(() => {
-    if (isPro) return;
-
-    const subscription = AppState.addEventListener('change', (nextAppState) => {
-      if (
-        appState.current.match(/inactive|background/) &&
-        nextAppState === 'active'
-      ) {
-        showAppOpen();
-      }
-      appState.current = nextAppState;
-    });
-
-    return () => {
-      subscription.remove();
-    };
-  }, [isPro]);
-
-  function showAppOpen(onClose?: () => void) {
-    if (isPro) {
-      onClose?.();
-      return null;
-    }
-
-    const isExpired = appOpenLoadedAt.current !== null && Date.now() - appOpenLoadedAt.current > APP_OPEN_EXPIRY_MS;
-
-    if (!appOpenReady.current || isExpired) {
-      if (isExpired) {
-        appOpenReady.current = false;
-        appOpenLoadedAt.current = null;
-        appOpen.load();
-      }
-      onClose?.();
-      return null;
-    }
-
-    const unsub = appOpen.addAdEventListener(AdEventType.CLOSED, () => {
-      unsub();
-      onClose?.();
-    });
-
-    appOpen.show();
-  }
 
   function showInterstitial(onClose?: () => void) {
     if (isPro) {
@@ -275,7 +193,7 @@ export function AdsProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <AdsContext.Provider value={{ isPro, showAppOpen, showInterstitial, showRewarded, showRewardedInterstitial }}>
+    <AdsContext.Provider value={{ isPro, showInterstitial, showRewarded, showRewardedInterstitial }}>
       {children}
     </AdsContext.Provider>
   );
